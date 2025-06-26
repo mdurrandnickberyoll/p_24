@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P24 Membres</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .header h2 {
+            color: #667eea;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 500;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus, input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background: white;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .members-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .members-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .members-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        
+        .members-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .stats {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stats h3 {
+            margin: 0;
+            color: #495057;
+            font-size: 1.2em;
+        }
+        
+        .filename-display {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .filename-display strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Liste des membres P24</h1>
+            <h2 id="groupeTitle">Groupe : Sélectionnez un groupe</h2>
+        </div>
+        
+        <div id="statusIndicator" class="status-indicator" style="display: none;"></div>
+        
+        <div class="form-section">
+            <div class="input-field" style="max-width: 400px; margin: 0 auto 20px auto;">
+                <label for="groupeSelect">Sélectionner le groupe *</label>
+                <select id="groupeSelect" onchange="changerGroupe()" required>
+                    <option value="">-- Choisir un groupe --</option>
+                    <option value="prieres_en_langues">Prières en langues et louanges</option>
+                    <option value="sante">Santé</option>
+                    <option value="jeunesse">Jeunesse</option>
+                    <option value="salut_des_ames">Salut des âmes et multiblication des justes</option>
+                    <option value="autorite">Autorité</option>
+                    <option value="declarations_prophetiquse">éclarations prophétiques</option>
+                    <option value="economie">Economie</option>
+                    <option value="eduation">Éducations</option>
+                    <option value="administration">Administrations publiques et privées</option>
+                    <option value="paix_et_securite">Paix et sécurité</option>
+                    <option value="autre">Autre (personnalisé)</option>
+                </select>
+            </div>
+            
+            <div class="input-field" id="autreGroupe" style="max-width: 400px; margin: 0 auto 20px auto; display: none;">
+                <label for="groupePersonnalise">Nom du groupe personnalisé</label>
+                <input type="text" id="groupePersonnalise" placeholder="Entrez le nom du groupe">
+            </div>
+        </div>
+        
+        <div class="filename-display" id="filenameDisplay" style="display: none;">
+            <strong>Nom du fichier :</strong> <span id="filenameText">p24_membres_groupe.xlsx</span>
+        </div>
+        
+        <div class="stats">
+            <h3>Nombre total de membres : <span id="memberCount">0</span> | Affichés : <span id="filteredCount">0</span></h3>
+        </div>
+        
+        <div class="form-section" id="filterSection" style="display: none;">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="filtreRecherche">🔍 Rechercher dans les membres</label>
+                    <input type="text" id="filtreRecherche" placeholder="Rechercher par nom, prénom, téléphone, pays ou ville..." oninput="filtrerMembres()">
+                </div>
+                <div class="input-field">
+                    <label for="filtrePays">Filtrer par pays</label>
+                    <select id="filtrePays" onchange="filtrerMembres()">
+                        <option value="">Tous les pays</option>
+                    </select>
+                </div>
+                <div class="input-field">
+                    <label for="filtreVille">Filtrer par ville</label>
+                    <select id="filtreVille" onchange="filtrerMembres()">
+                        <option value="">Toutes les villes</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="reinitialiserFiltres()">
+                    🔄 Réinitialiser les filtres
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="nom">Nom(s) *</label>
+                    <input type="text" id="nom" placeholder="Entrez le(s) nom(s)" required>
+                </div>
+                <div class="input-field">
+                    <label for="prenom">Prénom(s) *</label>
+                    <input type="text" id="prenom" placeholder="Entrez le(s) prénom(s)" required>
+                </div>
+                <div class="input-field">
+                    <label for="telephone">Téléphone(s)</label>
+                    <input type="tel" id="telephone" placeholder="Ex: +242 06 123 45 67">
+                </div>
+                <div class="input-field">
+                    <label for="pays">Pays</label>
+                    <input type="text" id="pays" placeholder="Ex: République du Congo">
+                </div>
+                <div class="input-field">
+                    <label for="ville">Ville(s)</label>
+                    <input type="text" id="ville" placeholder="Ex: Brazzaville">
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn-primary" onclick="ajouterMembre()">
+                    ➕ Ajouter le membre
+                </button>
+                <button type="button" class="btn-secondary" onclick="exporterExcel()">
+                    📊 Exporter vers Excel
+                </button>
+                <button type="button" class="btn-danger" onclick="viderListe()">
+                    🗑️ Vider la liste
+                </button>
+                <button type="button" class="btn-secondary" onclick="synchroniserBD()">
+                    🔄 Synchroniser BD
+                </button>
+            </div>
+        </div>
+        
+        <div id="tableContainer">
+            <table class="members-table" id="membersTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nom(s)</th>
+                        <th>Prénom(s)</th>
+                        <th>Téléphone(s)</th>
+                        <th>Pays</th>
+                        <th>Ville(s)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="membersBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let membres = [];
+        let membresFiltres = [];
+        let groupeActuel = '';
+        let nomGroupeActuel = '';
+
+        const groupes = {
+            'prieres_en_langues': 'Prières en langues et louanges',
+            'sante': 'Santé',
+            'jeunesse': 'Jeunesse',
+            'salut_des_ames': 'Salut des âmes et multiblication des justes',
+            'autorite': 'Autorité',
+            'declarations_prophetiquse': 'Déclarations prophétiques',
+            'economie': 'Economie',
+            'eduation': 'Éducations',
+            'administration': 'Administrations publiques et privées',
+            'paix_et_securite': 'Paix et sécurité'
+        };
+
+        // Classe pour gérer la base de données en mémoire
+        class P24Database {
+            constructor() {
+                this.data = {
+                    groupes: {},
+                    metadata: {
+                        version: '1.0',
+                        derniereMiseAJour: new Date().toISOString(),
+                        totalMembres: 0
+                    }
+                };
+                this.loadFromStorage();
+            }
+
+            loadFromStorage() {
+                try {
+                    const stored = localStorage.getItem('p24_database');
+                    if (stored) {
+                        this.data = JSON.parse(stored);
+                        console.log('Base de données chargée depuis le stockage local');
+                    }
+                } catch (error) {
+                    console.warn('Erreur lors du chargement:', error);
+                    this.createEmptyDatabase();
+                }
+            }
+
+            saveToStorage() {
+                try {
+                    this.data.metadata.derniereMiseAJour = new Date().toISOString();
+                    this.data.metadata.totalMembres = this.getTotalMembers();
+                    localStorage.setItem('p24_database', JSON.stringify(this.data));
+                    console.log('Base de données sauvegardée');
+                    return true;
+                } catch (error) {
+                    console.error('Erreur lors de la sauvegarde:', error);
+                    return false;
+                }
+            }
+
+            createEmptyDatabase() {
+                this.data = {
+                    groupes: {},
+                    metadata: {
+                        version: '1.0',
+                        derniereMiseAJour: new Date().toISOString(),
+                        totalMembres: 0
+                    }
+                };
+                this.saveToStorage();
+            }
+
+            getTotalMembers() {
+                let total = 0;
+                Object.values(this.data.groupes).forEach(groupe => {
+                    if (groupe.membres) {
+                        total += groupe.membres.length;
+                    }
+                });
+                return total;
+            }
+
+            ajouterMembre(groupeId, nomGroupe, membre) {
+                if (!this.data.groupes[groupeId]) {
+                    this.data.groupes[groupeId] = {
+                        nom: nomGroupe,
+                        membres: [],
+                        dateCreation: new Date().toISOString()
+                    };
+                }
+
+                membre.id = Date.now() + Math.random();
+                membre.dateAjout = new Date().toISOString();
+                
+                this.data.groupes[groupeId].membres.push(membre);
+                this.data.groupes[groupeId].derniereMiseAJour = new Date().toISOString();
+                
+                this.saveToStorage();
+                return membre;
+            }
+
+            supprimerMembre(groupeId, membreId) {
+                if (this.data.groupes[groupeId]) {
+                    this.data.groupes[groupeId].membres = this.data.groupes[groupeId].membres.filter(
+                        m => m.id !== membreId
+                    );
+                    this.data.groupes[groupeId].derniereMiseAJour = new Date().toISOString();
+                    this.saveToStorage();
+                    return true;
+                }
+                return false;
+            }
+
+            viderGroupe(groupeId) {
+                if (this.data.groupes[groupeId]) {
+                    this.data.groupes[groupeId].membres = [];
+                    this.data.groupes[groupeId].derniereMiseAJour = new Date().toISOString();
+                    this.saveToStorage();
+                    return true;
+                }
+                return false;
+            }
+
+            getMembres(groupeId) {
+                return this.data.groupes[groupeId]?.membres || [];
+            }
+
+            exportDatabase() {
+                const dataStr = JSON.stringify(this.data, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `p24_database_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // Instance globale de la base de données
+        let database = new P24Database();
+
+        // Fonctions principales
+        function changerGroupe() {
+            const select = document.getElementById('groupeSelect');
+            const autreGroupe = document.getElementById('autreGroupe');
+            const groupeTitle = document.getElementById('groupeTitle');
+            const filenameDisplay = document.getElementById('filenameDisplay');
+            const filenameText = document.getElementById('filenameText');
+            const filterSection = document.getElementById('filterSection');
+            
+            groupeActuel = select.value;
+            
+            if (groupeActuel === 'autre') {
+                autreGroupe.style.display = 'block';
+                document.getElementById('groupePersonnalise').focus();
+                filenameDisplay.style.display = 'none';
+                filterSection.style.display = 'none';
+            } else if (groupeActuel === '') {
+                autreGroupe.style.display = 'none';
+                groupeTitle.textContent = 'Groupe : Sélectionnez un groupe';
+                filenameDisplay.style.display = 'none';
+                filterSection.style.display = 'none';
+                nomGroupeActuel = '';
+                membres = [];
+                afficherMembres();
+            } else {
+                autreGroupe.style.display = 'none';
+                nomGroupeActuel = groupes[groupeActuel];
+                groupeTitle.textContent = `Groupe : ${nomGroupeActuel}`;
+                
+                const nomFichier = `p24_membres_${groupeActuel}.xlsx`;
+                filenameText.textContent = nomFichier;
+                filenameDisplay.style.display = 'block';
+                filterSection.style.display = 'block';
+                
+                membres = database.getMembres(groupeActuel);
+                afficherMembres();
+                mettreAJourFiltres();
+            }
+        }
+
+        // Gérer le groupe personnalisé
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('groupePersonnalise').addEventListener('input', function() {
+                const valeur = this.value.trim();
+                const groupeTitle = document.getElementById('groupeTitle');
+                const filenameDisplay = document.getElementById('filenameDisplay');
+                const filenameText = document.getElementById('filenameText');
+                const filterSection = document.getElementById('filterSection');
+                
+                if (valeur) {
+                    nomGroupeActuel = valeur;
+                    groupeTitle.textContent = `Groupe : ${valeur}`;
+                    
+                    const nomFichier = `p24_membres_${valeur.toLowerCase().replace(/[^a-z0-9]/g, '_')}.xlsx`;
+                    filenameText.textContent = nomFichier;
+                    filenameDisplay.style.display = 'block';
+                    filterSection.style.display = 'block';
+                    
+                    const groupeId = `custom_${valeur.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+                    groupeActuel = groupeId;
+                    
+                    membres = database.getMembres(groupeId);
+                    afficherMembres();
+                    mettreAJourFiltres();
+                } else {
+                    groupeTitle.textContent = 'Groupe : Autre (personnalisé)';
+                    filenameDisplay.style.display = 'none';
+                    filterSection.style.display = 'none';
+                    nomGroupeActuel = '';
+                    membres = [];
+                    afficherMembres();
+                }
+            });
+        });
+
+        function ajouterMembre() {
+            if (!nomGroupeActuel) {
+                alert('Veuillez d\'abord sélectionner un groupe.');
+                return;
+            }
+            
+            const nom = document.getElementById('nom').value.trim();
+            const prenom = document.getElementById('prenom').value.trim();
+            const telephone = document.getElementById('telephone').value.trim();
+            const pays = document.getElementById('pays').value.trim();
+            const ville = document.getElementById('ville').value.trim();
+            
+            if (!nom || !prenom) {
+                alert('Veuillez remplir au moins les champs Nom et Prénom.');
+                return;
+            }
+            
+            const membre = { nom, prenom, telephone, pays, ville };
+            
+            database.ajouterMembre(groupeActuel, nomGroupeActuel, membre);
+            membres = database.getMembres(groupeActuel);
+            
+            afficherMembres();
+            mettreAJourFiltres();
+            viderFormulaire();
+        }
+
+        function supprimerMembre(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce membre ?')) {
+                database.supprimerMembre(groupeActuel, id);
+                membres = database.getMembres(groupeActuel);
+                filtrerMembres();
+                mettreAJourFiltres();
+            }
+        }
+
+        function viderListe() {
+            if (membres.length === 0) {
+                alert('La liste est déjà vide.');
+                return;
+            }
+            
+            if (confirm('Êtes-vous sûr de vouloir vider toute la liste ?')) {
+                database.viderGroupe(groupeActuel);
+                membres = [];
+                membresFiltres = [];
+                afficherMembres();
+                mettreAJourFiltres();
+            }
+        }
+
+        function synchroniserBD() {
+            database.exportDatabase();
+            alert('Base de données exportée avec succès !');
+        }
+
+        function mettreAJourFiltres() {
+            const filtrePays = document.getElementById('filtrePays');
+            const filtreVille = document.getElementById('filtreVille');
+            
+            filtrePays.innerHTML = '<option value="">Tous les pays</option>';
+            filtreVille.innerHTML = '<option value="">Toutes les villes</option>';
+            
+            const paysUniques = [...new Set(membres.map(m => m.pays).filter(p => p))];
+            const villesUniques = [...new Set(membres.map(m => m.ville).filter(v => v))];
+            
+            paysUniques.sort().forEach(pays => {
+                const option = document.createElement('option');
+                option.value = pays;
+                option.textContent = pays;
+                filtrePays.appendChild(option);
+            });
+            
+            villesUniques.sort().forEach(ville => {
+                const option = document.createElement('option');
+                option.value = ville;
+                option.textContent = ville;
+                filtreVille.appendChild(option);
+            });
+        }
+
+        function filtrerMembres() {
+            const recherche = document.getElementById('filtreRecherche').value.toLowerCase();
+            const paysFiltre = document.getElementById('filtrePays').value;
+            const villeFiltre = document.getElementById('filtreVille').value;
+            
+            membresFiltres = membres.filter(membre => {
+                const matchRecherche = !recherche || 
+                    membre.nom.toLowerCase().includes(recherche) ||
+                    membre.prenom.toLowerCase().includes(recherche) ||
+                    membre.telephone.toLowerCase().includes(recherche) ||
+                    membre.pays.toLowerCase().includes(recherche) ||
+                    membre.ville.toLowerCase().includes(recherche);
+                
+                const matchPays = !paysFiltre || membre.pays === paysFiltre;
+                const matchVille = !villeFiltre || membre.ville === villeFiltre;
+                
+                return matchRecherche && matchPays && matchVille;
+            });
+            
+            afficherMembres();
+        }
+
+        function reinitialiserFiltres() {
+            document.getElementById('filtreRecherche').value = '';
+            document.getElementById('filtrePays').value = '';
+            document.getElementById('filtreVille').value = '';
+            membresFiltres = [];
+            afficherMembres();
+        }
+
+        function afficherMembres() {
+            const tbody = document.getElementById('membersBody');
+            const table = document.getElementById('membersTable');
+            const memberCount = document.getElementById('memberCount');
+            const filteredCount = document.getElementById('filteredCount');
+            
+            const membresAfficher = membresFiltres.length > 0 || 
+                document.getElementById('filtreRecherche').value ||
+                document.getElementById('filtrePays').value ||
+                document.getElementById('filtreVille').value ? membresFiltres : membres;
+            
+            memberCount.textContent = membres.length;
+            filteredCount.textContent = membresAfficher.length;
+            
+            if (membresAfficher.length === 0) {
+                table.style.display = 'none';
+                return;
+            }
+            
+            table.style.display = 'table';
+            tbody.innerHTML = '';
+            
+            membresAfficher.forEach((membre, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${membres.indexOf(membre) + 1}</strong></td>
+                    <td>${membre.nom}</td>
+                    <td>${membre.prenom}</td>
+                    <td>${membre.telephone || '-'}</td>
+                    <td>${membre.pays || '-'}</td>
+                    <td>${membre.ville || '-'}</td>
+                    <td>
+                        <button class="delete-btn" onclick="supprimerMembre(${membre.id})">
+                            🗑️ Supprimer
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function viderFormulaire() {
+            document.getElementById('nom').value = '';
+            document.getElementById('prenom').value = '';
+            document.getElementById('telephone').value = '';
+            document.getElementById('pays').value = '';
+            document.getElementById('ville').value = '';
+            document.getElementById('nom').focus();
+        }
+
+        function exporterExcel() {
+            if (!nomGroupeActuel) {
+                alert('Veuillez d\'abord sélectionner un groupe.');
+                return;
+            }
+            
+            const membresAExporter = membresFiltres.length > 0 || 
+                document.getElementById('filtreRecherche').value ||
+                document.getElementById('filtrePays').value ||
+                document.getElementById('filtreVille').value ? membresFiltres : membres;
+            
+            if (membresAExporter.length === 0) {
+                alert('Aucun membre à exporter. Veuillez d\'abord ajouter des membres.');
+                return;
+            }
+            
+            const donneesExcel = [
+                ['Liste des membres P24'],
+                [`Groupe : ${nomGroupeActuel}`],
+                [''],
+                ['#', 'Nom(s)', 'Prénom(s)', 'Téléphone(s)', 'Pays', 'Ville(s)']
+            ];
+            
+            membresAExporter.forEach((membre, index) => {
+                donneesExcel.push([
+                    index + 1,
+                    membre.nom,
+                    membre.prenom,
+                    membre.telephone || '',
+                    membre.pays || '',
+                    membre.ville || ''
+                ]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(donneesExcel);
+            const wb = XLSX.utils.book_new();
+            
+            ws['!cols'] = [
+                {wch: 5}, {wch: 20}, {wch: 20}, {wch: 18}, {wch: 20}, {wch: 20}
+            ];
+            
+            ws['!merges'] = [
+                {s: {r: 0, c: 0}, e: {r: 0, c: 5}},
+                {s: {r: 1, c: 0}, e: {r: 1, c: 5}}
+            ];
+            
+            XLSX.utils.book_append_sheet(wb, ws, "Membres P24");
+            
+            let nomFichier;
+            if (groupeActuel.startsWith('custom_')) {
+                nomFichier = `p24_membres_${nomGroupeActuel.toLowerCase().replace(/[^a-z0-9]/g, '_')}.xlsx`;
+            } else {
+                nomFichier = `p24_membres_${groupeActuel}.xlsx`;
+            }
+            
+            if (membresFiltres.length > 0 || 
+                document.getElementById('filtreRecherche').value ||
+                document.getElementById('filtrePays').value ||
+                document.getElementById('filtreVille').value) {
+                nomFichier = nomFichier.replace('.xlsx', '_filtre.xlsx');
+            }
+            
+            XLSX.writeFile(wb, nomFichier);
+        }
+
+        // Event listeners
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.id !== 'groupeSelect' && e.target.id !== 'groupePersonnalise' && 
+                !e.target.id.startsWith('filtre')) {
+                ajouterMembre();
+            }
+        });
+
+        // Focus sur le select au chargement
+        window.addEventListener('load', function() {
+            document.getElementById('groupeSelect').focus();
+        });
+    </script>
+</body>
+</html>    
